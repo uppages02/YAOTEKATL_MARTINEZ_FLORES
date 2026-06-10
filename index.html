@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Card | Entrenamiento Personalizado</title>
+    <style>
+        /* Estilos generales y bloqueo del scroll general */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0d0d0d;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #loading {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffaa80;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            padding: 5px 15px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Contenedor principal */
+        .card {
+            background: #1a1a24;
+            width: 92%;
+            height: 88vh; 
+            max-width: 380px; 
+            border-radius: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ff4500;
+            padding: 12px; 
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .profile-section {
+            padding: 15px 10px 10px 10px; 
+            text-align: center;
+            background: linear-gradient(180deg, #2a2a35 0%, #1a1a24 100%);
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
+        }
+
+        .photo {
+            width: 85px; 
+            height: 85px;
+            border-radius: 50%;
+            border: 3px solid #ff4500;
+            object-fit: cover;
+            margin-bottom: 8px;
+            box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+        }
+
+        .name {
+            font-size: 22px; 
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .schedule-badge {
+            display: inline-block;
+            background: rgba(255, 69, 0, 0.2);
+            color: #ffaa80;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 69, 0, 0.5);
+        }
+
+        .physical-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .p-stat { display: flex; flex-direction: column; }
+        .p-value { font-size: 18px; font-weight: bold; color: #fff; }
+        .p-label { font-size: 11px; color: #888; text-transform: uppercase; margin-top: 2px; }
+
+        .tabs {
+            display: flex;
+            background: #111;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 0; 
+            background: none;
+            border: none;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            color: #ff4500;
+            border-bottom: 3px solid #ff4500;
+            background: rgba(255, 69, 0, 0.08);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px 15px 20px 15px; 
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .skill-bar-container { margin-bottom: 12px; } 
+        .skill-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: bold;}
+        .skill-track { background: #333; height: 8px; border-radius: 4px; overflow: hidden; } 
+        .skill-fill { background: #ff4500; height: 100%; border-radius: 4px; transition: width 1s ease-in-out;}
+
+        .list-item {
+            background: #222;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-left: 3px solid #ff4500;
+            color: #eee;
+            line-height: 1.4;
+            white-space: pre-line; 
+        }
+
+        .coach-note {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ddd;
+            font-style: italic;
+            position: relative;
+            white-space: pre-line;
+            margin-bottom: 12px;
+        }
+        
+        .coach-note::before { content: '"'; font-size: 35px; color: #ff4500; position: absolute; top: -5px; left: 10px; opacity: 0.3; }
+
+        .date-badge { display: block; font-size: 12px; color: #ffaa80; margin-bottom: 8px; font-weight: bold; font-style: normal; text-transform: uppercase; }
+
+        .tab-content::-webkit-scrollbar { width: 4px; }
+        .tab-content::-webkit-scrollbar-track { background: #1a1a24; }
+        .tab-content::-webkit-scrollbar-thumb { background: #ff4500; border-radius: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="loading">Actualizando stats...</div>
+
+    <div class="card" id="player-card">
+        <div class="header">Desarrollo Individual</div>
+        
+        <!-- DATOS FIJOS DEL JUGADOR -->
+        <div class="profile-section">
+            <img src="https://imgur.com/SGNNC1Y.jpg" alt="Jugador" class="photo">
+            <h2 class="name">YAOTEKATL MARTINEZ FLORES</h2>
+             <div class="schedule-badge">EDAD 13 AÑOS</div>
+            <div class="schedule-badge">🗓️ Entrena: Martes y Jueves</div>
+            
+            <div class="physical-stats">
+                <div class="p-stat">
+                    <span class="p-value">1.56 m</span>
+                    <span class="p-label">Talla</span>
+                </div>
+                <div class="p-stat">
+                    <span class="p-value">41 kg</span>
+                    <span class="p-label">Peso</span>
+                </div>
+                <div class="p-stat">
+                    <span class="p-value">BASE</span>
+                    <span class="p-label">Posición</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('skills', this)">Reporte</button>
+            <button class="tab-btn" onclick="openTab('avances', this)">Avances</button>
+            <button class="tab-btn" onclick="openTab('observaciones', this)">Observación</button>
+        </div>
+
+        <div id="skills" class="tab-content active">
+            <div class="skill-bar-container">
+                <div class="skill-header"><span>Mecánica de Tiro</span> <span id="txt-tiro">0%</span></div>
+                <div class="skill-track"><div class="skill-fill" id="bar-tiro" style="width: 0%;"></div></div>
+            </div>
+            <div class="skill-bar-container">
+                <div class="skill-header"><span>Drible</span> <span id="txt-drible">0%</span></div>
+                <div class="skill-track"><div class="skill-fill" id="bar-drible" style="width: 0%;"></div></div>
+            </div>
+            <div class="skill-bar-container">
+                <div class="skill-header"><span>Tiro en Suspensión</span> <span id="txt-suspension">0%</span></div>
+                <div class="skill-track"><div class="skill-fill" id="bar-suspension" style="width: 0%;"></div></div>
+            </div>
+            <div class="skill-bar-container">
+                <div class="skill-header"><span>Finalización</span> <span id="txt-finalizacion">0%</span></div>
+                <div class="skill-track"><div class="skill-fill" id="bar-finalizacion" style="width: 0%;"></div></div>
+            </div>
+        </div>
+
+        <!-- Aquí se inyectarán las listas automáticamente -->
+        <div id="avances" class="tab-content"></div>
+        <div id="observaciones" class="tab-content"></div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // PEGA AQUÍ EL ID DEL GOOGLE SHEET DE ESTE JUGADOR
+        const SHEET_ID = '1r23lXR4xXCsJyZkhzZXwwtL-qWaQeYVzu_-YXXb419c'; 
+        // ==========================================
+
+        function openTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        async function cargarDatos() {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+            try {
+                const respuesta = await fetch(url);
+                const texto = await respuesta.text();
+                const datosJson = JSON.parse(texto.substring(47).slice(0, -2));
+                const filas = datosJson.table.rows;
+
+                if (filas.length > 0) {
+                    
+                    let tiro = 0, drible = 0, suspension = 0, finalizacion = 0;
+                    let htmlAvances = "";
+                    let htmlObservaciones = "";
+
+                    // Recorrer TODAS las filas que hayas escrito en el Excel
+                    for (let i = 0; i < filas.length; i++) {
+                        let row = filas[i].c;
+
+                        // 1. ACTUALIZAR PORCENTAJES (Tomará los números de la última fila que tenga números)
+                        if (row[0] && row[0].v !== null) tiro = row[0].v;
+                        if (row[1] && row[1].v !== null) drible = row[1].v;
+                        if (row[2] && row[2].v !== null) suspension = row[2].v;
+                        if (row[3] && row[3].v !== null) finalizacion = row[3].v;
+
+                        // 2. CREAR BLOQUES DE AVANCES (Si la columna E tiene texto)
+                        if (row[4] && row[4].v) {
+                            htmlAvances += `<div class="list-item">${row[4].v}</div>`;
+                        }
+
+                        // 3. CREAR BLOQUES DE OBSERVACIONES (Si la columna G tiene texto)
+                        if (row[6] && row[6].v) {
+                            let fecha = (row[5] && row[5].v) ? row[5].v : "Sin fecha";
+                            htmlObservaciones += `
+                                <div class="coach-note">
+                                    <span class="date-badge">Sesión: ${fecha}</span>
+                                    ${row[6].v}
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Inyectar los porcentajes finales en las barras
+                    document.getElementById('txt-tiro').innerText = tiro + '%';
+                    document.getElementById('bar-tiro').style.width = tiro + '%';
+                    
+                    document.getElementById('txt-drible').innerText = drible + '%';
+                    document.getElementById('bar-drible').style.width = drible + '%';
+                    
+                    document.getElementById('txt-suspension').innerText = suspension + '%';
+                    document.getElementById('bar-suspension').style.width = suspension + '%';
+
+                    document.getElementById('txt-finalizacion').innerText = finalizacion + '%';
+                    document.getElementById('bar-finalizacion').style.width = finalizacion + '%';
+
+                    // Inyectar todo el historial construido
+                    if (htmlAvances === "") htmlAvances = '<div class="list-item">Sin avances registrados.</div>';
+                    document.getElementById('avances').innerHTML = htmlAvances;
+
+                    if (htmlObservaciones === "") htmlObservaciones = '<div class="coach-note">Sin observaciones.</div>';
+                    document.getElementById('observaciones').innerHTML = htmlObservaciones;
+                    
+                    document.getElementById('loading').style.display = 'none';
+                } else {
+                    document.getElementById('loading').innerText = "⚠️ El Excel está vacío (llena desde la fila 2).";
+                }
+
+            } catch (error) {
+                document.getElementById('loading').innerText = "⚠️ Error al conectar. Verifica que el Sheet sea público.";
+                console.error(error);
+            }
+        }
+
+        cargarDatos();
+    </script>
+</body>
+</html>
